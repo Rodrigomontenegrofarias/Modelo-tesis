@@ -1,0 +1,47 @@
+version: "3"
+
+# Definir servicios
+services:
+  
+  mysql:                # Container para la base de datos.
+    build:                # Instrucciones para crear imagen
+      context: ./sql          # Dontexto actual
+      dockerfile: Dockerfile # Nombre Dockerfile
+    restart: always
+    ports:
+      - "3306:3306"        # Nombre de la red asignada
+    
+    environment:           # Variables de entorno
+      MYSQL_ROOT_PASSWORD: sSeCr4t100114
+      MYSQL_ROOT_HOST: 164.90.154.103
+      MYSQL_DATABASE: demo
+     # MYSQL_USER: root
+      MYSQL_PASSWORD: sSeCr4t100114
+     # VIRTUAL_HOST: 24.199.124.40 # DNS asignado al container
+    container_name: mysql # Nomnbre del container
+
+  myapp:                 # Container para el myapp2
+    build:                # Instrucciones para crear imagen
+      context: .          # Dontexto actual
+      dockerfile: Dockerfile # Nombre Dockerfile
+    restart: always       # Indica que el container se reinicie siempre.
+    ports:
+      - "164.90.154.103:8881:8888"
+    networks:             # Asignar una red al container
+     - red_proxy          # Nombre de la red asignada
+     - red_privada        # Nombre de la red asignada
+    depends_on:
+     - mysql
+    environment:
+      VIRTUAL_HOST: 164.90.154.103 # DNS asignado al container
+
+# Nombre de los volumenes son data, data1, data2, ... ,dataN segun corresponda
+volumes:                   # Defenir volumenes
+  data:                    # Nombre del volumen asignado al proyecto
+
+# El nombre de las redes no cambia (red_proxy y red_privada son estandar)
+networks:                  # Definir redes
+  red_proxy:               # Nombre de una red
+    external:              # Indica que es una red externa al docker-compose
+      name: nginx-proxy    # Nombre de la Red de uso publico entre Docker
+  red_privada:             # Nombre de una red que depende del docker-compose
