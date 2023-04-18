@@ -45,8 +45,7 @@ services:
     ports:                        # Asignacion del puerto 80 al proxy
      - "80:80"
      - "443:443"
-     - "8881:8888"
-     - "3306:3306"
+  
     volumes:                      # Entrega información de de Docker 
      - /var/run/docker.sock:/tmp/docker.sock:ro
 

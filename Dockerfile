@@ -2,8 +2,6 @@ FROM ubuntu:18.04
 # Image providing Jupyter notebook server with Python 3.6 bindings for OpenCV 3.4.5
 # Based on https://www.pyimagesearch.com/2018/05/28/ubuntu-18-04-how-to-install-opencv/
 
-
-
 # Switch to root to be able to install stuff
 USER root
 
@@ -77,7 +75,6 @@ RUN pip install -q keras==2.3.1
 #RUN pip install --upgrade tensorflow
 #RUN pip install numpy
 #RUN pip install keras
-
 #RUN pip install tensorflow==1.15.4
 
 
@@ -142,7 +139,12 @@ RUN apt-get update && apt-get install -y \
 # Build and instal
 RUN apt-get update && apt-get install -y libeigen3-dev
 
-
+RUN apt-get update
+RUN apt-get install -y curl
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+RUN apt-get update
+RUN apt-get install -y gh
 
 #RUN pip install keras-levenberg-marquardt
 # Configure, compile, install, clean up
@@ -169,7 +171,10 @@ RUN apt-get update && apt-get install -y libeigen3-dev
 
 # Copy Jupyter settings
 COPY .jupyter .jupyter
+COPY mytoken.txt mytoken.txt
 
+#RUN gh auth login --with-token < mytoken.txt
+#RUN gh ssh-key add /id_rsa.pub
 # Install required python packages
 RUN mkdir notebooks
 ADD requirements.txt notebooks/requirements.txt
@@ -183,7 +188,89 @@ COPY notebooks notebooks
 WORKDIR /root/notebooks
 ENV PYTHONPATH=/root/notebooks
 
+# Add SSH key
+#RUN ssh-keygen -t rsa -b 4096 -C "rodrigo.montenegro@alumnos.uv.cl" -f ~/.ssh/id_rsa -q -N ""
+#RUN cat ~/.ssh/id_rsa.pub
+#RUN mkdir -p ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+# Generate the SSH key pair
+RUN ssh-keygen -t rsa -b 4096 -C "rodrigo.montenegro@alumnos.uv.cl" -N "" -f /root/.ssh/id_rsa
 
+# Print the private key to the console
+#RUN echo "========================================="
+RUN cat /root/.ssh/id_rsa
+#RUN echo "=========================================
+#RUN mkdir -p /root/.ssh/
+#RUN
+RUN chmod -R  660 /root/.ssh/id_rsa
+
+RUN apt-get update \
+    && apt-get install -y curl \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -w - \
+       | tee /usr/share/keyrings/githubcli-archive-keyring.gpg >/dev/null \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+       | tee /etc/apt/sources.list.d/github-cli.list >/dev/null \
+    && apt-get update \
+    && apt-get install gh -y
+
+# Copy token file and SSH key
+COPY mytoken.txt mytoken.txt
+#RUN mkdir id_rsa
+#RUN cd /root/.ssh/
+#RUN cp -r /root/.ssh/id_rsa /root/.ssh/id_rsa 
+#ADD id_rsa id_rsa
+#RUN chmod 600 /root/.ssh/id_rsa
+#RUN ssh-keyscan github.com/Rodrigomontenegrofarias >> /root/.ssh/known_hosts
+
+#RUN gh auth login --with-token < mytoken.txt
+
+#RUN gh ssh-key add ~/.ssh/id_rsa.pub
+
+#WORKDIR /root/.ssh
+#COPY id_rsa.pub id_rsa.pub
+
+
+#RUN !git config user.email "rodrigo.montenegro@alumnos.uv.cl"
+
+#RUN !git config user.name "Rodrigomontenegrofarias"
+RUN git config --global user.email "rodrigo.montenegro@alumnos.uv.cl"
+RUN git config --global user.name "Rodrigomontenegrofarias"
+
+#RUN gh auth login --with-token < mytoken.txt
+# Set environment variables
+#ENV GH_TOKEN= "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"
+
+# Log in with gh
+#RUN echo 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 | gh auth login --with-token --stdin
+
+#RUN gh auth login --with-token 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
+#ENV GITHUB_TOKEN=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
+#RUN gh auth login --with-token $GITHUB_TOKEN
+#RUN gh ssh-key add ~/.ssh/id_rsa.pub
+# Add a one minute delay
+#RUN sleep 60
+#FROM ubuntu:latest
+
+# Install dependencies
+#RUN apt-get update && \
+#    apt-get install -y git && \
+#    apt-get install -y curl && \
+#    apt-get install -y gnupg && \
+#    apt-get install -y lsb-release
+
+# Install gh CLI
+#RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg && \
+#    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages $(lsb_release -cs) main" > /etc/apt/sources.list.d/github-cli.list && \
+#    apt-get update && \
+#    apt-get install gh && \
+#    apt-get clean
+
+# Authenticate with GitHub
+
+#ENV GITHUB_TOKEN=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
+#RUN gh ssh-key add ~/.ssh/id_rsa.pub
+#RUN gh auth login --with-token < "$GITHUB_TOKEN"
+#RUN gh ssh-key add ~/.ssh/id_rsa.pub
+# run script dowload prueba
 RUN sh /root/notebooks/script.sh
 # Run tests
 #RUN py.test tests/test_requirements.py
