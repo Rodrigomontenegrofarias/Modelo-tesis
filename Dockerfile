@@ -171,7 +171,7 @@ RUN apt-get install -y gh
 
 # Copy Jupyter settings
 COPY .jupyter .jupyter
-COPY mytoken.txt mytoken.txt
+#COPY mytoken.txt mytoken.txt
 
 #RUN gh auth login --with-token < mytoken.txt
 #RUN gh ssh-key add /id_rsa.pub
@@ -213,7 +213,7 @@ RUN apt-get update \
     && apt-get install gh -y
 
 # Copy token file and SSH key
-COPY mytoken.txt mytoken.txt
+#COPY mytoken.txt mytoken.txt
 #RUN mkdir id_rsa
 #RUN cd /root/.ssh/
 #RUN cp -r /root/.ssh/id_rsa /root/.ssh/id_rsa 
@@ -265,13 +265,55 @@ RUN git config --global user.name "Rodrigomontenegrofarias"
 #    apt-get clean
 
 # Authenticate with GitHub
+#RUN ssh-keygen -t rsa -b 4096 -C "rodrigo.montenegro@alumnos.uv.cl"
+#
 
+RUN set -xe
+RUN myemail="rodrigo.montenegro@alumnos.uv.cl"
+
+#your personal access token
+RUN git_api_token="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"
+
+#We'll use the HTTPS to push a ssh key to git, SSH for pull/push configuration
+RUN gitrepo_ssh="git@github.com:Rodrigomontenegrofarias/resultados-31-01.git"
+RUN gitrepo_https="https://github.com/Rodrigomontenegrofarias/resultados-31-01.git"
+
+#Generating SSH key:
+#/root/.ssh/id_rsa
+#RUN ssh-keygen -f "root/.ssh/id_rsa" -t rsa -b 4096 -C "${myemail}" -N ''
+RUN sslpub="$(cat root/.ssh/id_rsa.pub |tail -1)"
+
+#git API path for posting a new ssh-key:
+RUN git_api_addkey="https://api.$(echo ${gitrepo_https} |cut -d'/' -f3)/user/keys"
+
+#lets name the ssh-key in get after the hostname with a timestamp:
+RUN git_ssl_keyname="$(date +%d-%m-%Y)"
+
+#Finally lets post this ssh key:
+RUN curl -H "Authorization: token ${git_api_token}" -u "Rodrigomontenegrofarias" https://api.github.com  -H "Content-Type: application/json" -X POST -d "{\"title\":\"${git_ssl_keyname}\",\"key\":\"${sslpub}\"}" ${git_api_addkey}
+
+
+#RUN curl -u "Rodrigomontenegrofarias" \ --data "{\"title\":\"DevVm_`date +%Y%m%d%H%M%S`\",\"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"\":\"`cat ~/.ssh/id_rsa.pub`\"}" \ https://api.github.com/Rodrigomontenegrofarias/keys
 #ENV GITHUB_TOKEN=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
 #RUN gh ssh-key add ~/.ssh/id_rsa.pub
 #RUN gh auth login --with-token < "$GITHUB_TOKEN"
 #RUN gh ssh-key add ~/.ssh/id_rsa.pub
 # run script dowload prueba
 RUN sh /root/notebooks/script.sh
+RUN jupyter trust exp_final_1.0.ipynb
+RUN jupyter trust exp_final_2.0.ipynb
+RUN jupyter trust exp_final_3.0.ipynb
+RUN jupyter trust exp_final_4.0.ipynb
+RUN jupyter trust exp_final_5.0.ipynb
+RUN jupyter trust exp_final_6.0.ipynb
+RUN jupyter trust exp_final_7.0.ipynb
+RUN jupyter trust exp_final_8.0.ipynb
+RUN jupyter trust exp_final_9.0.ipynb
+RUN jupyter trust exp_final_10.0.ipynb
+
+
+
+
 # Run tests
 #RUN py.test tests/test_requirements.py
 
