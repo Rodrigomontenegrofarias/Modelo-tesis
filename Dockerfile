@@ -1,17 +1,17 @@
 
-#Imagen base desde docker HUB
+# Imagen base desde docker HUB
 FROM ubuntu:18.04
 
 # Datos del desarrollador
 MAINTAINER Rodrigo Montenegro "rodrigo.montenegro@alumnos.uv.cl"
 
-# Cambia a root para poder instalar librerias.
+# Cambia a root para instalar librerias.
 USER root
 
 # Esto hará que apt-get sea instalado
 ARG DEBIAN_FRONTEND=noninteractive
 
-#Instalacion de paquetes adicionales con apt-get, para el sistema.
+# Instalacion de paquetes adicionales con apt-get, para el sistema.
 RUN apt-get update  && \
     apt-get -y upgrade && \
     apt-get -y install apt-utils && \
@@ -29,23 +29,23 @@ RUN apt-get -y install python3.7-dev python3.7 python3-pip && \
     pip3 install --upgrade pip && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 
-# instalacion apt-get 
+# Instalacion apt-get, libeigen3-dev.
 RUN apt-get update && apt-get install -y python3 libeigen3-dev cmake
-# Build and instal
+# Actualizamos apt-get y instalamos libgtk-3-dev
 RUN apt-get update && apt-get install -y libeigen3-dev
-# 
+# actualizamos apt-get y instalamos libgtk-3-dev
 RUN apt-get -y install libgtk-3-dev
-#RUN apt-get -y install libatlas-base-dev gfortran#
+ 
 # Actualizacion de paquetes apt-get
 RUN apt-get update
 
 # Direccionar hacia el direcctorio root.
 WORKDIR /root
 
-# Add SSH key
+# Añadimos SSH key para vincularlo con github.
 RUN ssh-keygen -t rsa -b 4096 -C "rodrigo.montenegro@alumnos.uv.cl" -f ~/.ssh/id_rsa -q -N ""
-RUN cat /root/.ssh/id_rsa
-RUN chmod -R  660 /root/.ssh/id_rsa
+# Permiso 600 a la carpeta /.ssh archivo id_resa recursivamente.
+RUN chmod -R  600 /root/.ssh/id_rsa
 
 # Instalacion de paquetes adicionales con pip
 RUN pip install matplotlib
@@ -78,20 +78,19 @@ RUN pip install eigen==0.0.1
 RUN pip install tensorflow-addons[Levenberg-Marquardt]
 RUN pip install keras==2.4.3
 
-
 #Copiar desde la carpeta generada desde github al contenedor.
 COPY .jupyter .jupyter
-# crear directorio notebook
+# Creamos directorio notebooks
 RUN mkdir notebooks
 # Añadir el archvo requirements.txt a la carpeta recien creada notebook
 ADD requirements.txt notebooks/requirements.txt
-# Instalar mediante el comando pip el archivo requirements.txt
+# Instalar mediante el comando pip el archivo requirements.txt recien añadido a la carpeta notebok-
 RUN pip install -r notebooks/requirements.txt
 # Copiar la carpeta de notebook y su contenido a notebook del contenedor que se creara.
 COPY notebooks notebooks
-# Con este comando nos direccionamos al directorio /root/notebooks
+# Con este comando nos direccionamos en el directorio /root/notebooks
 WORKDIR /root/notebooks
 #
 ENTRYPOINT ["jupyter", "notebook"]
-# la aplicacion sera expuesta en el puerto 
+# la aplicacion sera expuesta en el puerto 8888
 EXPOSE 8888
