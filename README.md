@@ -1,4 +1,4 @@
-# Proyecto investigativo de titulacion Rodrigo Montenegro, Universidad Valparaiso.
+# Proyecto investigativo de titulacion Rodrigo Montenegro, Universidad de Valparaiso.
 
 Titulo: ESTIMACIÓN DE POTENCIAL DE RECOLECCIÓN DE AGUA DE ROCÍO MEDIANTE MODELOS Y APRENDIZAJE AUTOMÁTICO.
 
