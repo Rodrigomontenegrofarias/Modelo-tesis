@@ -1,40 +1,37 @@
 version: "3"
-
 # Definir servicios
 services:
-  
-  mysql:                # Container para la base de datos.
-    build:                # Instrucciones para crear imagen
-      context: ./sql          # Dontexto actual
+  mysql:                     # Container para la base de datos.
+    build:                   # Instrucciones para crear imagen
+      context: ./sql         # Dontexto actual
       dockerfile: Dockerfile # Nombre Dockerfile
     restart: always
+    mem_limit: 1000m
+    cpus: 0.5  # Limita la uso de CPU al 50%
     ports:
-      - "3306:3306"        # Nombre de la red asignada
-    
+     - ${MYSQL_ROOT_PORT} # Nombre de la red asignad
     environment:           # Variables de entorno
-      MYSQL_ROOT_PASSWORD: sSeCr4t100114
-      MYSQL_ROOT_HOST: 142.93.199.193
-      MYSQL_DATABASE: demo
-     # MYSQL_USER: root
-      MYSQL_PASSWORD: sSeCr4t100114
-     # VIRTUAL_HOST: 24.199.124.40 # DNS asignado al container
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     container_name: mysql # Nomnbre del container
-
-  myapp:                 # Container para el myapp2
+  myapp:                  # Container para el myapp2
     build:                # Instrucciones para crear imagen
       context: .          # Dontexto actual
       dockerfile: Dockerfile # Nombre Dockerfile
     restart: always       # Indica que el container se reinicie siempre.
     ports:
-      - "142.93.199.193:8881:8888"
+     - ${JUPYTER_PORT}   # Varibale de la red asignada Port
     networks:             # Asignar una red al container
      - red_proxy          # Nombre de la red asignada
      - red_privada        # Nombre de la red asignada
     depends_on:
      - mysql
     environment:
-      VIRTUAL_HOST: 142.93.199.193 # DNS asignado al container
-  
+      VIRTUAL_HOST: ${MYSQL_ROOT_HOST}# DNS asignado al container
+    mem_limit: 300m
+    cpus: 0.5  # Limita la uso de CPU al 50%
   # servicio de proxy entre contenedores
   nginx-proxy:
     # comando para configurar Nginx
@@ -45,21 +42,19 @@ services:
     ports:                        # Asignacion del puerto 80 al proxy
      - "80:80"
      - "443:443"
-  
     volumes:                      # Entrega información de de Docker 
      - /var/run/docker.sock:/tmp/docker.sock:ro
-
 # Nombre de los volumenes son data, data1, data2, ... ,dataN segun corresponda
 volumes:                   # Defenir volumenes
   data:                    # Nombre del volumen asignado al proyecto
-
 # El nombre de las redes no cambia (red_proxy y red_privada son estandar)
 networks:   
   default:
     external:
-      name: nginx-proxy              # Definir redes
+      name: nginx-proxy    # Definir redes
   red_proxy:               # Nombre de una red
     external:              # Indica que es una red externa al docker-compose
       name: nginx-proxy    # Nombre de la Red de uso publico entre Docker
   red_privada:             # Nombre de una red que depende del docker-compose
+
 
