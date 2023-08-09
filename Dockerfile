@@ -1,4 +1,3 @@
-
 # Imagen base desde docker HUB
 FROM ubuntu:18.04
 
@@ -29,6 +28,9 @@ RUN apt-get -y install python3.7-dev python3.7 python3-pip && \
     pip3 install --upgrade pip && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 
+RUN apt-get -y install build-essential cmake unzip pkg-config wget
+RUN apt-get -y install libjpeg-dev libpng-dev libtiff-dev
+
 # Instalacion apt-get, libeigen3-dev.
 RUN apt-get update && apt-get install -y python3 libeigen3-dev cmake
 # Actualizamos apt-get y instalamos libgtk-3-dev
@@ -36,6 +38,16 @@ RUN apt-get update && apt-get install -y libeigen3-dev
 # actualizamos apt-get y instalamos libgtk-3-dev
 RUN apt-get -y install libgtk-3-dev
  
+RUN apt-get -y install libatlas-base-dev gfortran
+ENV OPENCV_VERSION=3.4.5
+
+RUN echo "Downloading OpenCV source..." && \
+    wget -O opencv.tgz https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.tar.gz -nv && \
+    wget -O opencv_contrib.tgz https://github.com/Itseez/opencv_contrib/archive/${OPENCV_VERSION}.tar.gz -nv && \
+    echo "Extracting OpenCV sources..." && \
+    tar xzf opencv.tgz && \
+    tar xzf opencv_contrib.tgz
+
 # Actualizacion de paquetes apt-get
 RUN apt-get update
 
@@ -49,6 +61,7 @@ RUN chmod -R  600 /root/.ssh/id_rsa
 
 # Instalacion de paquetes adicionales con pip
 RUN pip install matplotlib
+RUN pip install opencv-python==4.5.4.58
 RUN pip install pandas
 RUN pip install keras
 RUN pip install -U -q segmentation-models
@@ -58,15 +71,20 @@ RUN pip install scipy
 RUN pip install scikit-learn
 RUN pip install seaborn
 RUN pip install keras
+RUN pip install imageio-ffmpeg
 RUN pip install sklearn
 RUN pip install conda
 RUN pip install scikit-image
 RUN pip install pillow
+RUN pip install moviepy
 RUN pip install --upgrade matplotlib
 RUN pip install keras-models==0.0.2
 RUN pip install charset-normalizer==2.0.12
 RUN pip install plotly
+RUN pip install chardet
 RUN pip install statsmodels
+RUN pip install openpyxl
+RUN apt-get update && apt-get install -y git
 RUN pip install sqlalchemy
 RUN pip install PyMySQL==1.0.1
 RUN pip install pyodbc==4.0.34
@@ -93,4 +111,4 @@ WORKDIR /root/notebooks
 #
 ENTRYPOINT ["jupyter", "notebook"]
 # la aplicacion sera expuesta en el puerto 8888
-EXPOSE 8888
+
