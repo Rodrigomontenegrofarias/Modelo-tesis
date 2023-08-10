@@ -22,21 +22,26 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 RUN apt-get update && \
     apt-get install -y git
-
-# Instalamos python3.7.
 RUN apt-get -y install python3.7-dev python3.7 python3-pip && \
     pip3 install --upgrade pip && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
+
+# Instalamos python3.7.
+RUN apt-get update && \
+    apt-get -y install git python3.7-dev python3.7 python3-pip && \
+    apt-get -y install build-essential cmake unzip pkg-config wget libjpeg-dev libpng-dev libtiff-dev \
+    libeigen3-dev libgtk-3-dev libatlas-base-dev gfortran && \
+    apt-get -y install libatlas-base-dev gfortran
 
 RUN apt-get -y install build-essential cmake unzip pkg-config wget
 RUN apt-get -y install libjpeg-dev libpng-dev libtiff-dev
 
 # Instalacion apt-get, libeigen3-dev.
-RUN apt-get update && apt-get install -y python3 libeigen3-dev cmake
+#RUN apt-get update && apt-get install -y python3 libeigen3-dev cmake
 # Actualizamos apt-get y instalamos libgtk-3-dev
-RUN apt-get update && apt-get install -y libeigen3-dev
+#RUN apt-get update && apt-get install -y libeigen3-dev
 # actualizamos apt-get y instalamos libgtk-3-dev
-RUN apt-get -y install libgtk-3-dev
+#RUN apt-get -y install libgtk-3-dev
  
 RUN apt-get -y install libatlas-base-dev gfortran
 ENV OPENCV_VERSION=3.4.5
@@ -60,7 +65,7 @@ RUN ssh-keygen -t rsa -b 4096 -C "rodrigo.montenegro@alumnos.uv.cl" -f ~/.ssh/id
 RUN chmod -R  600 /root/.ssh/id_rsa
 
 # Instalacion de paquetes adicionales con pip
-RUN pip install matplotlib
+#RUN pip install matplotlib
 RUN pip install opencv-python==4.5.4.58
 RUN pip install pandas
 RUN pip install keras
@@ -79,9 +84,7 @@ RUN pip install pillow
 RUN pip install moviepy
 RUN pip install --upgrade matplotlib
 RUN pip install keras-models==0.0.2
-RUN pip install charset-normalizer==2.0.12
 RUN pip install plotly
-RUN pip install chardet
 RUN pip install statsmodels
 RUN pip install openpyxl
 RUN apt-get update && apt-get install -y git
@@ -111,4 +114,3 @@ WORKDIR /root/notebooks
 #
 ENTRYPOINT ["jupyter", "notebook"]
 # la aplicacion sera expuesta en el puerto 8888
-
