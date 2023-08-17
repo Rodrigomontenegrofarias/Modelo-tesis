@@ -6,6 +6,7 @@ c.NotebookApp.token = '' # Sin token. Siempre use jupyter sobre el túnel ssh
 c.NotebookApp.notebook_dir = '/root/notebooks' # direcctorio de nuestros notebooks
 c.NotebookApp.allow_root = True # Permitir ejecutar Jupyter desde el usuario raíz dentro del contenedor Docker
 c.NotebookApp.allow_origin = '*'
+c.NotebookApp.kernel_restart_interval = -1
 c.NotebookApp.tornado_settings = { 
     'headers': { 
         'Content-Security-Policy': "frame-ancestors 'self' *" 

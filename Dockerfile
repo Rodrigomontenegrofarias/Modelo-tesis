@@ -55,7 +55,7 @@ RUN echo "Downloading OpenCV source..." && \
 
 # Actualizacion de paquetes apt-get
 RUN apt-get update
-
+RUN apt-get install -y openssh-client
 # Direccionar hacia el direcctorio root.
 WORKDIR /root
 
@@ -65,7 +65,7 @@ RUN ssh-keygen -t rsa -b 4096 -C "rodrigo.montenegro@alumnos.uv.cl" -f ~/.ssh/id
 RUN chmod -R  600 /root/.ssh/id_rsa
 
 # Instalacion de paquetes adicionales con pip
-#RUN pip install matplotlib
+RUN pip install matplotlib
 RUN pip install opencv-python==4.5.4.58
 RUN pip install pandas
 RUN pip install keras
