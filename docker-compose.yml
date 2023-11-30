@@ -6,8 +6,8 @@ services:
       context: ./sql         # Dontexto actual
       dockerfile: Dockerfile # Nombre Dockerfile
     restart: always
-    mem_limit: 800m
-    cpus: 0.5  # Limita la uso de CPU al 50%
+    mem_limit: 1800m
+    cpus: 0.25  # Limita la uso de CPU al 50%
     ports:
      - ${MYSQL_ROOT_PORT} # Nombre de la red asignad
     environment:           # Variables de entorno
@@ -30,8 +30,8 @@ services:
      - mysql
     environment:
       VIRTUAL_HOST: ${MYSQL_ROOT_HOST}# DNS asignado al container
-    mem_limit: 3100m
-    cpus: 0.95  # Limita la uso de CPU al 50%
+    mem_limit: 2100m
+    cpus: 0.75  # Limita la uso de CPU al 50%
   # servicio de proxy entre contenedores
   nginx-proxy:
     # comando para configurar Nginx
